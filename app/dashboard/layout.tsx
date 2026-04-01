@@ -99,7 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="text-xl font-bold whitespace-nowrap text-transparent bg-clip-text"
                 style={{ backgroundImage: `linear-gradient(90deg, ${INDIGO}, ${CYAN})` }}
               >
-                Nexus IMS
+                IOMS
               </span>
             </motion.div>
           )}

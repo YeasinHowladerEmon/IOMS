@@ -61,11 +61,14 @@ export function useLoginMutation() {
       showToast(`Welcome back, ${userName}!`, "success");
     },
     onError: (error: any) => {
+      const isNotFound = error.message?.toLowerCase().includes("not found") || error.message?.toLowerCase().includes("not exist");
       showAlert({
-        title: "Login Failed",
-        message: error.message || "Invalid email or password. Please try again.",
+        title: isNotFound ? "Account Not Found" : "Login Failed",
+        message: isNotFound 
+          ? "We couldn't find an account with that email address. Please check your spelling or sign up."
+          : (error.message || "Invalid credentials. Please try again or reset your password."),
         type: "danger",
-        confirmText: "Try Again"
+        confirmText: isNotFound ? "Sign Up Instead" : "Try Again"
       });
     }
   });
@@ -82,11 +85,14 @@ export function useSignupMutation() {
       showToast(`Account created successfully. Welcome, ${userName}!`, "success");
     },
     onError: (error: any) => {
+      const isDuplicate = error.message?.toLowerCase().includes("already exists") || error.message?.toLowerCase().includes("registered");
       showAlert({
-        title: "Registration Failed",
-        message: error.message || "Could not create your account. Please try again.",
+        title: isDuplicate ? "Email Already Registered" : "Registration Error",
+        message: isDuplicate 
+          ? "An account with this email already exists. Would you like to log in instead?"
+          : (error.message || "We encountered an issue creating your account. Please try again."),
         type: "danger",
-        confirmText: "Back to Sign Up"
+        confirmText: isDuplicate ? "Go to Login" : "Try Again"
       });
     }
   });

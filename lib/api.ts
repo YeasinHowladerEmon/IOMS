@@ -34,6 +34,13 @@ axiosInstance.interceptors.response.use(
       if (Array.isArray(nested)) return nested;
       
       const keys = Object.keys(nested);
+      
+      // If it contains pagination meta, return the whole object
+      if (nested.meta && keys.includes('data')) return nested;
+
+      // If the object has an ID, it's likely the primary resource, don't unwrap its arrays
+      if (nested.id || nested._id || nested.uuid) return nested;
+
       const arrays = keys.filter(k => Array.isArray(nested[k]));
       if (arrays.length === 1) return nested[arrays[0]];
       

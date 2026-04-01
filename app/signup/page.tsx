@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function SignupPage() {
   const { signup, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   // Auto-redirect if already logged in
@@ -32,8 +33,8 @@ export default function SignupPage() {
     try {
       await signup(data);
       router.push("/dashboard");
-    } catch (error) {
-      console.error("Signup failed:", error);
+    } catch (error: any) {
+      setError(error.message || "Something went wrong.");
       setIsLoading(false);
     }
   };
@@ -58,6 +59,18 @@ export default function SignupPage() {
         </div>
 
         <form onSubmit={handleSubmit(handleSignup)} className="space-y-6">
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium border border-destructive/20 text-center"
+              >
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div className="space-y-4">
             <div>
               <label className={`block text-sm font-medium mb-2 ${errors.name ? "text-destructive" : "text-foreground"}`}>

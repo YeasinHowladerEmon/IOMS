@@ -37,6 +37,7 @@ function LoginForm() {
   const { login, user } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading]     = useState(false);
+  const [error, setError]             = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -59,8 +60,8 @@ function LoginForm() {
     try {
       await login(data);
       router.replace(next);
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (error: any) {
+      setError(error.message || "Invalid credentials.");
       setIsLoading(false);
     }
   };
@@ -71,12 +72,11 @@ function LoginForm() {
       await login({ email: "demoUser@example.com", password: "demo123" });
       router.replace(next);
     } catch (error) {
-      console.error("Demo login failed:", error);
+      setError("Demo access failed. Please try again.");
       setIsLoading(false);
     }
   };
 
-  /* focused border style */
   const focusBorder = (field: string) =>
     focusedField === field
       ? { borderColor: INDIGO, boxShadow: `0 0 0 3px ${INDIGO}20` }
@@ -139,7 +139,7 @@ function LoginForm() {
             <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-xl">
               <Package className="w-6 h-6 text-white" />
             </div>
-            <span className="text-white font-bold text-2xl tracking-wide">Nexus IMS</span>
+            <span className="text-white font-bold text-2xl tracking-wide">IOMS</span>
           </div>
         </motion.div>
 
@@ -192,7 +192,7 @@ function LoginForm() {
         </motion.div>
 
         <motion.p className="relative z-10 text-white/35 text-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}>
-          © 2026 Nexus IMS. All rights reserved.
+          © 2026 IOMS. All rights reserved.
         </motion.p>
       </div>
 
@@ -211,7 +211,7 @@ function LoginForm() {
             <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${INDIGO}, ${CYAN})` }}>
               <Package className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl text-foreground">Nexus IMS</span>
+            <span className="font-bold text-xl text-foreground">IOMS</span>
           </motion.div>
 
           {/* Heading */}

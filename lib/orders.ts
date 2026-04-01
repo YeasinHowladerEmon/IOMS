@@ -8,30 +8,43 @@
 import { useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { api } from "./api";
 import { useOverlay } from "./overlay-context";
+import { PaginatedResponse } from "./products";
 
 /* ── Types ── */
+export interface OrderFilters {
+  searchTerm?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}
 export type OrderStatus =
-  | "Pending"
-  | "Confirmed"
-  | "Shipped"
-  | "Delivered"
-  | "Cancelled";
+  | "PENDING"
+  | "CONFIRMED"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
 
 export interface OrderItem {
-  productId:   string;
-  productName: string;
-  quantity:    number;
-  unitPrice:   number;
+  productId: string;
+  quantity: number;
+  price: number;
+  product?: {
+    name: string;
+    price: number;
+  };
 }
 
 export interface Order {
-  id:           string;
+  id: string;
+  userId: number;
   customerName: string;
-  items:        OrderItem[];
-  totalPrice:   number;
-  status:       OrderStatus;
-  createdAt:    string;   // ISO date string
-  updatedAt:    string;
+  orderItems: OrderItem[];
+  totalPrice: number;
+  status: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateOrderPayload {
@@ -46,24 +59,31 @@ export interface CreateOrderPayload {
 
 /* ── API helpers ── */
 export const ordersApi = {
-  getAll:       ()                              => api.get<Order[]>("/orders"),
+  getAll: (filters: OrderFilters = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        params.append(key, value.toString());
+      }
+    });
+    const queryString = params.toString();
+    return api.get<PaginatedResponse<Order>>(`/orders${queryString ? `?${queryString}` : ""}`);
+  },
   getById:      (id: string)                    => api.get<Order>(`/orders/${id}`),
   create:       (payload: CreateOrderPayload)   => api.post<Order>("/orders", payload),
   updateStatus: (id: string, status: OrderStatus) =>
     api.patch<Order>(`/orders/${id}/status`, { status }),
   cancel:       (id: string)                    =>
-    api.patch<Order>(`/orders/${id}/status`, { status: "Cancelled" }),
+    api.patch<Order>(`/orders/${id}/cancel`, {}),
   delete:       (id: string)                    => api.delete<void>(`/orders/${id}`),
 };
 
 /* ── Hooks: useOrders ── */
-export const ordersOptions = queryOptions({
-  queryKey: ["orders"],
-  queryFn: ordersApi.getAll,
-});
-
-export function useOrdersQuery() {
-  return useQuery(ordersOptions);
+export function useOrdersQuery(filters: OrderFilters = {}) {
+  return useQuery({
+    queryKey: ["orders", filters],
+    queryFn: () => ordersApi.getAll(filters),
+  });
 }
 
 /* ── Hooks: Mutations ── */
@@ -74,13 +94,19 @@ export function useCreateOrderMutation() {
     mutationFn: ordersApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["restock-queue"] });
       showToast("Order created successfully", "success");
     },
     onError: (error: any) => {
+      const isStockError = error.message?.toLowerCase().includes("stock") || error.message?.toLowerCase().includes("inventory") || error.message?.toLowerCase().includes("quantity");
       showAlert({
-        title: "Order Creation Error",
-        message: error.message || "Failed to create order. Please check your items and stock levels.",
-        type: "danger"
+        title: isStockError ? "Insufficient Stock" : "Order Error",
+        message: isStockError 
+          ? (error.message || "Some items in your order are no longer available in the requested quantity.")
+          : (error.message || "We couldn't process this order. Please try again or contact support."),
+        type: "danger",
+        confirmText: "Review Order"
       });
     }
   });
@@ -100,10 +126,14 @@ export function useUpdateStatusMutation() {
       showToast(`Order #${updatedOrder.id.slice(0, 8)} status: ${variables.status}`, "success");
     },
     onError: (error: any) => {
+      const isTransitionError = error.message?.toLowerCase().includes("transition") || error.message?.toLowerCase().includes("cannot");
       showAlert({
-        title: "Status Update Error",
-        message: error.message || "Failed to update order status.",
-        type: "danger"
+        title: isTransitionError ? "Invalid Status Change" : "Update Failed",
+        message: isTransitionError 
+          ? "This order cannot be moved directly to the requested status. Please follow the standard workflow."
+          : (error.message || "We encountered an error while updating the order status."),
+        type: "danger",
+        confirmText: "Close"
       });
     }
   });
@@ -115,17 +145,20 @@ export function useCancelOrderMutation() {
   return useMutation({
     mutationFn: (id: string) => ordersApi.cancel(id),
     onSuccess: (updatedOrder) => {
-      queryClient.setQueryData(["orders"], (old: Order[] | undefined) => {
-        if (!old) return old;
-        return old.map((o) => (o.id === updatedOrder.id ? updatedOrder : o));
-      });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["restock-queue"] });
       showToast(`Order #${updatedOrder.id.slice(0, 8)} cancelled`, "info");
     },
     onError: (error: any) => {
+      const isLocked = error.message?.toLowerCase().includes("shipped") || error.message?.toLowerCase().includes("delivered");
       showAlert({
-        title: "Cancellation Error",
-        message: error.message || "Failed to cancel order.",
-        type: "danger"
+        title: isLocked ? "Order Locked" : "Cancellation Error",
+        message: isLocked 
+          ? "This order has already been processed and cannot be cancelled."
+          : (error.message || "An error occurred while trying to cancel the order."),
+        type: "danger",
+        confirmText: "Go Back"
       });
     }
   });
@@ -137,9 +170,9 @@ export function calcTotal(items: { quantity: number; unitPrice: number }[]): num
 }
 
 export const STATUS_OPTIONS: OrderStatus[] = [
-  "Pending",
-  "Confirmed",
-  "Shipped",
-  "Delivered",
-  "Cancelled",
+  "PENDING",
+  "CONFIRMED",
+  "SHIPPED",
+  "DELIVERED",
+  "CANCELLED",
 ];

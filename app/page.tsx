@@ -72,7 +72,7 @@ export default function Home() {
             <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
               <Package className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight">Nexus IMS</span>
+            <span className="font-bold text-xl tracking-tight">IOMS</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
@@ -148,8 +148,8 @@ export default function Home() {
             <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent z-10" />
             <div className="rounded-3xl border border-white/10 overflow-hidden shadow-2xl backdrop-blur-sm bg-white/5">
               <Image 
-                src="/nexus_dashboard_mockup.png" 
-                alt="Nexus Dashboard" 
+                src="/dashboard_mockup.png" 
+                alt="IOMS Dashboard" 
                 width={1200} 
                 height={800} 
                 className="w-full h-auto opacity-80"
@@ -254,7 +254,7 @@ export default function Home() {
                 Log In
               </Link>
             </div>
-            <p className="mt-10 text-white/60 font-medium">Join 5,000+ businesses growing with Nexus IMS.</p>
+            <p className="mt-10 text-white/60 font-medium">Join 5,000+ businesses growing with IOMS.</p>
           </div>
         </div>
       </section>
@@ -266,11 +266,11 @@ export default function Home() {
             <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
               <Package className="w-5 h-5 text-indigo-400" />
             </div>
-            <span className="font-bold text-xl text-white/50">Nexus IMS</span>
+            <span className="font-bold text-xl text-white/50">IOMS</span>
           </div>
           
           <div className="text-white/30 text-sm font-medium">
-            © 2026 Nexus Systems Inc. Built with ❤️ for modern commerce.
+            © 2026 IOMS Systems Inc. Built with ❤️ for modern commerce.
           </div>
 
           <div className="flex items-center gap-6">

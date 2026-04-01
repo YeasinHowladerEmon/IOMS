@@ -44,10 +44,14 @@ export function useCreateCategoryMutation() {
       showToast("Category created successfully", "success");
     },
     onError: (error: any) => {
+      const isDuplicate = error.message?.toLowerCase().includes("already exists");
       showAlert({
-        title: "Category Error",
-        message: error.message || "Failed to create category.",
-        type: "danger"
+        title: isDuplicate ? "Duplicate Category" : "Creation Failed",
+        message: isDuplicate 
+          ? `The category name you entered is already in use. Please try a different name.`
+          : (error.message || "Could not create your category at this time."),
+        type: "danger",
+        confirmText: "Try Again"
       });
     }
   });

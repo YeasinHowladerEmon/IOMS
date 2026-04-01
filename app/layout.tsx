@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nexus IMS — Inventory & Order Management",
+  title: "IOMS — Inventory & Order Management System",
   description: "Advanced inventory and order management system.",
 };
 

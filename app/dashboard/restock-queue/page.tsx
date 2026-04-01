@@ -2,15 +2,13 @@
 
 import { 
   useRestockQueueQuery, 
-  useUpdateRestockStatusMutation,
+  useRestockMutation,
+  useDeleteFromQueueMutation,
 } from "@/lib/restock";
 import { motion } from "framer-motion";
 import { 
   Loader2, 
   RefreshCcw,
-  CheckCircle,
-  Truck,
-  Timer,
   AlertTriangle,
   Package,
   TrendingDown
@@ -19,15 +17,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-const STATUS_MAP = {
-  Pending:   { icon: <Timer className="w-4 h-4" />, variant: "warning" as const, label: "Pending" },
-  Ordered:   { icon: <Truck className="w-4 h-4" />, variant: "info" as const, label: "Ordered" },
-  Completed: { icon: <CheckCircle className="w-4 h-4" />, variant: "success" as const, label: "Completed" },
-};
 
 export default function RestockQueuePage() {
   const { data: items = [], isLoading, error, refetch } = useRestockQueueQuery();
-  const { mutateAsync: updateStatus, isPending: isUpdating } = useUpdateRestockStatusMutation();
+  const { mutateAsync: restock, isPending: isUpdating } = useRestockMutation();
+  const { mutateAsync: dismiss } = useDeleteFromQueueMutation();
 
   return (
     <motion.div 
@@ -81,17 +75,17 @@ export default function RestockQueuePage() {
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-foreground line-clamp-1">{item.productName}</h3>
+                  <h3 className="text-xl font-bold text-foreground line-clamp-1">{item.product.name}</h3>
                   <div className="flex gap-2">
-                    <Badge variant="outline">Stock: {item.currentStock}</Badge>
+                    <Badge variant="outline">Stock: {item.product.stockQuantity}</Badge>
                     <Badge variant="danger" className="bg-destructive/10 border-destructive/20 text-destructive">
-                      Below {item.lowStockThreshold}
+                      Min: {item.product.minStockThreshold}
                     </Badge>
                   </div>
                 </div>
                 <div className="shrink-0">
-                  <Badge variant={STATUS_MAP[item.status].variant} className="p-2.5 rounded-xl">
-                    {STATUS_MAP[item.status].icon}
+                  <Badge variant={item.priority === "HIGH" ? "danger" : item.priority === "MEDIUM" ? "warning" : "success"} className="p-2.5 rounded-xl">
+                    <Package className="w-4 h-4" />
                   </Badge>
                 </div>
               </div>
@@ -100,8 +94,8 @@ export default function RestockQueuePage() {
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Priority</span>
                   <span className={`text-base font-bold ${
-                    item.priority === "High" ? "text-destructive" : 
-                    item.priority === "Medium" ? "text-warning" : 
+                    item.priority === "HIGH" ? "text-destructive" : 
+                    item.priority === "MEDIUM" ? "text-warning" : 
                     "text-emerald-500"
                   }`}>
                     {item.priority}
@@ -109,31 +103,29 @@ export default function RestockQueuePage() {
                 </div>
 
                 <div className="flex gap-2">
-                  {item.status === "Pending" && (
                     <Button 
                       size="sm"
-                      onClick={() => updateStatus({ id: item.id, status: "Ordered" })}
+                      isLoading={isUpdating}
+                      onClick={() => restock({ productId: item.productId, stockToAdd: item.product.minStockThreshold })}
                     >
-                      <Truck className="w-4 h-4 mr-2" />
-                      Mark Ordered
+                      <RefreshCcw className="w-4 h-4 mr-2" />
+                      Restock (+{item.product.minStockThreshold})
                     </Button>
-                  )}
-                  {item.status === "Ordered" && (
                     <Button 
                       size="sm"
-                      onClick={() => updateStatus({ id: item.id, status: "Completed" })}
+                      variant="outline"
+                      className="hover:bg-destructive/5 hover:text-destructive hover:border-destructive/30"
+                      onClick={() => dismiss(item.productId)}
                     >
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Complete
+                      Dismiss
                     </Button>
-                  )}
                 </div>
               </div>
 
               {/* Priority indicator line */}
               <div 
                 className={`absolute bottom-0 left-0 right-0 h-1 transition-all ${
-                  item.priority === "High" ? "bg-destructive shadow-[0_0_15px_oklch(0.65_0.22_22)]" : "bg-muted/40"
+                  item.priority === "HIGH" ? "bg-destructive shadow-[0_0_15px_oklch(0.65_0.22_22)]" : "bg-muted/40"
                 }`} 
               />
             </Card>

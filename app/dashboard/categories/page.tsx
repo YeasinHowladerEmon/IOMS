@@ -46,7 +46,7 @@ export default function CategoriesPage() {
       setShowAddModal(false);
       setNewCat({ name: "", description: "" });
     } catch (e) {
-      console.error(e);
+      // Error is handled by UI/Toast
     }
   };
 

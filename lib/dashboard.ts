@@ -7,17 +7,24 @@ import { useQuery, queryOptions } from "@tanstack/react-query";
 import { api } from "./api";
 
 export interface DashboardStats {
-  totalRevenue: number;
-  totalOrders: number;
-  totalProducts: number;
-  totalCustomers: number;
-  revenueChange: number;
-  ordersChange: number;
-  stockChange: number;
-  customersChange: number;
-  recentActivity: any[];
-  topProducts: any[];
-  revenueByDay: { day: string; revenue: number }[];
+  insights: {
+    totalOrdersToday: number;
+    pendingOrders: number;
+    completedOrders: number;
+    lowStockItemsCount: number;
+    revenueToday: number;
+  };
+  revenueAnalytics: { date: string; revenue: number; orderCount: number }[];
+  recentActivities: {
+    id: string;
+    message: string;
+    createdAt: string;
+  }[];
+  productSummary: {
+    name: string;
+    stockQuantity: number;
+    status: string;
+  }[];
 }
 
 export const dashboardApi = {

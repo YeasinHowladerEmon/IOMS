@@ -82,7 +82,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           <select
             ref={ref}
             className={cn(
-              "w-full px-4 py-3 rounded-2xl bg-input/30 border border-border text-base text-foreground focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 appearance-none cursor-pointer",
+              "w-full px-4 py-3 rounded-2xl bg-input/30 border border-border text-base text-foreground focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 appearance-none cursor-pointer [&>option]:bg-background [&>option]:text-foreground",
               error && "border-destructive/50 focus:border-destructive",
               className
             )}
