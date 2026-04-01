@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://inventory-order-manegment-backend.vercel.app/api/v1";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -22,7 +22,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => {
     const data = response.data;
-    
+
     // First check for explicit failures in the body
     if (data && data.success === false) {
       return Promise.reject(new ApiError(response.status, data.message || "Operation failed"));
@@ -32,9 +32,9 @@ axiosInstance.interceptors.response.use(
     if (data && data.success === true && data.data !== undefined) {
       const nested = data.data;
       if (Array.isArray(nested)) return nested;
-      
+
       const keys = Object.keys(nested);
-      
+
       // If it contains pagination meta, return the whole object
       if (nested.meta && keys.includes('data')) return nested;
 
@@ -43,7 +43,7 @@ axiosInstance.interceptors.response.use(
 
       const arrays = keys.filter(k => Array.isArray(nested[k]));
       if (arrays.length === 1) return nested[arrays[0]];
-      
+
       return nested;
     }
     return data;
@@ -60,17 +60,17 @@ axiosInstance.interceptors.response.use(
 
     if (error.response) {
       const data = error.response.data as any;
-      
+
       // Prioritize the 'message' field from the user's specific backend format
       const message = (typeof data === "string" ? data : (data?.message || data?.error)) || `Error ${error.response.status}`;
-      
+
       return Promise.reject(new ApiError(error.response.status, message));
     }
 
     if (error.request) {
       // If the browser blocked the response (CORS) or the server is down
       const isCorsOrNetwork = error.message === "Network Error";
-      const message = isCorsOrNetwork 
+      const message = isCorsOrNetwork
         ? "Network Error (CORS or Connection). Check server status and origin permissions."
         : (error.message || "No response received from server.");
       return Promise.reject(new ApiError(0, message));
