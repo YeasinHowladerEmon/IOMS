@@ -9,6 +9,13 @@
 
 ---
 
+## 🌐 Live Demos
+
+*   **Frontend Application**: [https://inventory-order-manegment.vercel.app/](https://inventory-order-manegment.vercel.app/)
+*   **Backend API**: [https://inventory-order-manegment-backend.vercel.app/](https://inventory-order-manegment-backend.vercel.app/)
+
+---
+
 ## ✨ Key Features & Platform Intelligence
 
 *   **📊 Advanced Analytics Dashboard**: Real-time dual-metric visualization of key performance indicators (KPIs) with interactive `Recharts` graphs.
@@ -41,6 +48,7 @@
 *   **Validation Engine**: [Zod](https://zod.dev/)
 
 **Backend Integration**
+*   **Repository**: [IOMS-Backend GitHub](https://github.com/YeasinHowladerEmon/IOMS-Backend)
 *   **API Ecosystem**: Node.js & Express (Configured for Vercel Serverless Deployment)
 *   **Database Management**: PostgreSQL managed via Prisma ORM
 
@@ -83,7 +91,7 @@ Create a `.env.local` file in the root directory of your project. This file is n
 NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
 ```
 
-*(Note: If you have deployed the backend to Vercel, replace `http://localhost:5000/api/v1` with your production Vercel API URL. If testing against a local backend, ensure your Node.js/Prisma backend server is running and accessible on port 5000.)*
+*(Note: If you have deployed the backend to Vercel, replace `http://localhost:5000/api/v1` with your production Vercel API URL. If testing against a local backend, clone the [IOMS-Backend repository](https://github.com/YeasinHowladerEmon/IOMS-Backend) and ensure your Node.js/Prisma backend server is running and accessible on port 5000.)*
 
 ### 4. Running the Development Server
 
