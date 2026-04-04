@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { useDashboardStatsQuery } from "@/lib/dashboard";
+import { useRefresh } from "@/hooks/use-refresh";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -29,6 +30,7 @@ const INDIGO = "oklch(0.68 0.24 262)";
 export default function DashboardPage() {
   const { user } = useAuth();
   const { data: stats, isLoading, error, refetch } = useDashboardStatsQuery();
+  const { handleRefresh } = useRefresh(refetch);
   const [chartMetric, setChartMetric] = useState<'revenue' | 'orders'>('revenue');
 
   if (isLoading) {
@@ -96,7 +98,7 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-           <Button variant="outline" size="icon" onClick={() => refetch()} isLoading={isLoading}>
+           <Button variant="outline" size="icon" onClick={handleRefresh} isLoading={isLoading}>
              <RefreshCcw className="w-5 h-5" />
            </Button>
            <Badge variant="outline" className="px-4 py-2 border-primary/20 bg-primary/5 hidden sm:flex items-center gap-2">

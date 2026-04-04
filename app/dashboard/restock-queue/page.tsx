@@ -5,6 +5,7 @@ import {
   useRestockMutation,
   useDeleteFromQueueMutation,
 } from "@/lib/restock";
+import { useRefresh } from "@/hooks/use-refresh";
 import { motion } from "framer-motion";
 import { 
   Loader2, 
@@ -22,6 +23,7 @@ export default function RestockQueuePage() {
   const { data: items = [], isLoading, error, refetch } = useRestockQueueQuery();
   const { mutateAsync: restock, isPending: isUpdating } = useRestockMutation();
   const { mutateAsync: dismiss } = useDeleteFromQueueMutation();
+  const { handleRefresh } = useRefresh(refetch);
 
   return (
     <motion.div 
@@ -39,7 +41,7 @@ export default function RestockQueuePage() {
         <Button 
           variant="outline" 
           size="icon" 
-          onClick={() => refetch()}
+          onClick={handleRefresh}
           isLoading={isLoading}
         >
           <RefreshCcw className="w-5 h-5" />
@@ -51,7 +53,7 @@ export default function RestockQueuePage() {
           <div className="flex items-center gap-3 font-semibold">
             <AlertTriangle className="w-5 h-5" />
             {(error as Error).message}
-            <Button variant="ghost" size="sm" onClick={() => refetch()} className="ml-auto underline">Retry</Button>
+            <Button variant="ghost" size="sm" onClick={handleRefresh} className="ml-auto underline">Retry</Button>
           </div>
         </Card>
       )}

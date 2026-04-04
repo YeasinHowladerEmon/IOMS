@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://inventory-order-manegment-backend.vercel.app/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -30,12 +30,20 @@ axiosInstance.interceptors.response.use(
 
     // Then handle success data extraction
     if (data && data.success === true && data.data !== undefined) {
+      // If the response is paginated (has meta at the same level as data)
+      if (data.meta) {
+        return {
+          meta: data.meta,
+          data: data.data,
+        };
+      }
+
       const nested = data.data;
       if (Array.isArray(nested)) return nested;
 
       const keys = Object.keys(nested);
 
-      // If it contains pagination meta, return the whole object
+      // Legacy check for nested pagination (in case some endpoints wrap data differently)
       if (nested.meta && keys.includes('data')) return nested;
 
       // If the object has an ID, it's likely the primary resource, don't unwrap its arrays
@@ -50,6 +58,8 @@ axiosInstance.interceptors.response.use(
   },
   (error: AxiosError) => {
     // For debugging connectivity / CORS issues
+
+    console.log(error.response?.data)
     console.error("API Error Details:", {
       url: error.config?.url,
       method: error.config?.method,

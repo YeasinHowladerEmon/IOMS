@@ -118,12 +118,9 @@ export function useUpdateStatusMutation() {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: OrderStatus }) =>
       ordersApi.updateStatus(id, status),
-    onSuccess: (updatedOrder, variables) => {
-      queryClient.setQueryData(["orders"], (old: Order[] | undefined) => {
-        if (!old) return old;
-        return old.map((o) => (o.id === updatedOrder.id ? updatedOrder : o));
-      });
-      showToast(`Order #${updatedOrder.id.slice(0, 8)} status: ${variables.status}`, "success");
+    onSuccess: (updatedOrder) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      showToast(`Order #${updatedOrder.id.slice(0, 8)} status updated`, "success");
     },
     onError: (error: any) => {
       const isTransitionError = error.message?.toLowerCase().includes("transition") || error.message?.toLowerCase().includes("cannot");

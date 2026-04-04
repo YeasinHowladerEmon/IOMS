@@ -27,16 +27,16 @@ import type { Variants } from "framer-motion";
 
 /* ─── BRAND COLORS ─── */
 const INDIGO = "oklch(0.68 0.24 262)";
-const CYAN   = "oklch(0.78 0.18 205)";
+const CYAN = "oklch(0.78 0.18 205)";
 
 const navigation = [
-  { name: "Overview",   href: "/dashboard",               icon: LayoutDashboard },
-  { name: "Products",   href: "/dashboard/products",      icon: Package         },
-  { name: "Categories", href: "/dashboard/categories",    icon: Layers          },
-  { name: "Orders",     href: "/dashboard/orders",        icon: ShoppingCart    },
-  { name: "Restock",    href: "/dashboard/restock-queue", icon: Truck           },
-  { name: "Activity",   href: "/dashboard/activity-logs", icon: History         },
-  { name: "Settings",   href: "#",                        icon: Settings        },
+  { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Products", href: "/dashboard/products", icon: Package },
+  { name: "Categories", href: "/dashboard/categories", icon: Layers },
+  { name: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
+  { name: "Restock", href: "/dashboard/restock-queue", icon: Truck },
+  { name: "Activity", href: "/dashboard/activity-logs", icon: History },
+  { name: "Settings", href: "#", icon: Settings },
 ];
 
 const slideIn: Variants = {
@@ -47,10 +47,10 @@ const slideIn: Variants = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, logout } = useAuth();
   const { showAlert } = useOverlay();
-  const router   = useRouter();
+  const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isMobileOpen,  setIsMobileOpen]  = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -114,9 +114,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center px-3.5 py-3 rounded-2xl transition-all duration-150 group relative ${
-                isActive ? "" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
+              className={`flex items-center px-3.5 py-3 rounded-2xl transition-all duration-150 group relative ${isActive ? "" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
             >
               {isActive && (
                 <motion.div
@@ -167,7 +166,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-base font-bold text-foreground truncate leading-tight">{user.name}</p>
-              <p className="text-sm text-muted-foreground mt-0.5">Administrator</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{user.role}</p>
             </div>
           </div>
         )}
@@ -329,7 +328,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-3 cursor-pointer group">
               <div className="hidden md:block text-right">
                 <p className="text-base font-bold text-foreground leading-tight">{user.name}</p>
-                <p className="text-sm text-muted-foreground">Admin</p>
+                <p className="text-sm text-muted-foreground">{user.role}</p>
               </div>
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-base shadow-lg ring-2 ring-offset-2 ring-offset-background transition-all ring-primary/30 group-hover:ring-primary/60"

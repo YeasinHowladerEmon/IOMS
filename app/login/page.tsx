@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginValues } from "@/lib/validation";
 import { useAuth } from "@/lib/auth-context";
-import { LogIn, ArrowRight, Loader2, Eye, EyeOff, Package, Zap, BarChart3, Shield } from "lucide-react";
+import { LogIn, ArrowRight, Loader2, Eye, EyeOff, Package, Zap, BarChart3, Shield, Mail, Lock } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
@@ -267,84 +267,90 @@ function LoginForm() {
           {/* Form */}
           <form onSubmit={handleSubmit(handleLogin)} className="space-y-5">
 
-            {/* Email — floating label */}
-            <motion.div variants={fadeUp} className="relative">
-              <label
-                className={`absolute left-4 transition-all duration-200 pointer-events-none z-10 font-medium ${
-                  focusedField === "email" || errors.email
-                    ? "top-2 text-xs"
-                    : "top-1/2 -translate-y-1/2 text-base text-muted-foreground"
-                }`}
-                style={focusedField === "email" || errors.email ? { color: errors.email ? "#ef4444" : INDIGO } : undefined}
-              >
-                Email Address
-              </label>
-              <input
-                {...register("email")}
-                type="email"
-                required
-                onFocus={() => setFocusedField("email")}
-                onBlur={() => setFocusedField(null)}
-                style={errors.email ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239, 68, 68, 0.1)" } : focusBorder("email")}
-                className={`w-full pt-7 pb-3 px-4 rounded-2xl bg-input/30 border transition-all outline-none text-base text-foreground ${errors.email ? "border-red-500" : "border-border"}`}
-              />
+            {/* Email Field */}
+            <motion.div variants={fadeUp} className="space-y-3">
+              <label className="text-xs font-black text-muted-foreground/90 ml-1 tracking-[0.1em] uppercase">Email Address</label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 group-focus-within:text-primary transition-all duration-300">
+                  <Mail className="w-5 h-5" style={focusedField === "email" ? { color: INDIGO, filter: `drop-shadow(0 0 8px ${INDIGO}40)` } : undefined} />
+                </div>
+                <input
+                  {...register("email")}
+                  type="email"
+                  required
+                  placeholder="name@company.com"
+                  onFocus={() => setFocusedField("email")}
+                  onBlur={() => setFocusedField(null)}
+                  className={`w-full pl-12 pr-4 py-4.5 rounded-2xl bg-black/40 backdrop-blur-2xl border transition-all duration-300 outline-none text-base text-foreground placeholder:text-muted-foreground/30 ${
+                    errors.email ? "border-red-500/80 bg-red-500/5 shadow-[0_0_15px_rgba(239,68,68,0.1)]" : "border-border/80 focus:border-primary/80"
+                  }`}
+                  style={focusedField === "email" ? { boxShadow: `0 0 25px ${INDIGO}15, 0 0 0 1px ${INDIGO}30`, borderColor: INDIGO } : undefined}
+                />
+              </div>
               <AnimatePresence>
                 {errors.email && (
-                  <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-red-500 text-sm mt-1 px-1">
+                  <motion.p initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-red-400 text-sm font-bold mt-2 px-2 flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-red-400" />
                     {errors.email.message}
                   </motion.p>
                 )}
               </AnimatePresence>
             </motion.div>
 
-            {/* Password — floating label */}
-            <motion.div variants={fadeUp} className="relative">
-              <label
-                className={`absolute left-4 transition-all duration-200 pointer-events-none z-10 font-medium ${
-                  focusedField === "password" || errors.password
-                    ? "top-2 text-xs"
-                    : "top-1/2 -translate-y-1/2 text-base text-muted-foreground"
-                }`}
-                style={focusedField === "password" || errors.password ? { color: errors.password ? "#ef4444" : INDIGO } : undefined}
-              >
-                Password
-              </label>
-              <input
-                {...register("password")}
-                type={showPassword ? "text" : "password"}
-                required
-                onFocus={() => setFocusedField("password")}
-                onBlur={() => setFocusedField(null)}
-                style={errors.password ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239, 68, 68, 0.1)" } : focusBorder("password")}
-                className={`w-full pt-7 pb-3 px-4 pr-14 rounded-2xl bg-input/30 border transition-all outline-none text-base text-foreground ${errors.password ? "border-red-500" : "border-border"}`}
-              />
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-[24px] text-muted-foreground hover:text-foreground transition-colors"
-                style={{ top: focusedField === "password" || errors.password ? "24px" : "50%" }}
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
+            {/* Password Field */}
+            <motion.div variants={fadeUp} className="space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <label className="text-xs font-black text-muted-foreground/90 tracking-[0.1em] uppercase">Password</label>
+                <Link href="#" className="text-xs font-black hover:text-white transition-all tracking-wider" style={{ color: INDIGO }}>
+                  FORGOT?
+                </Link>
+              </div>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 group-focus-within:text-primary transition-all duration-300">
+                  <Lock className="w-5 h-5" style={focusedField === "password" ? { color: INDIGO, filter: `drop-shadow(0 0 8px ${INDIGO}40)` } : undefined} />
+                </div>
+                <input
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="••••••••"
+                  onFocus={() => setFocusedField("password")}
+                  onBlur={() => setFocusedField(null)}
+                  className={`w-full pl-12 pr-14 py-4.5 rounded-2xl bg-black/40 backdrop-blur-2xl border transition-all duration-300 outline-none text-base text-foreground placeholder:text-muted-foreground/30 ${
+                    errors.password ? "border-red-500/80 bg-red-500/5 shadow-[0_0_15px_rgba(239,68,68,0.1)]" : "border-border/80 focus:border-primary/80"
+                  }`}
+                  style={focusedField === "password" ? { boxShadow: `0 0 25px ${INDIGO}15, 0 0 0 1px ${INDIGO}30`, borderColor: INDIGO } : undefined}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-all p-1"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
               <AnimatePresence>
                 {errors.password && (
-                  <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-red-500 text-sm mt-1 px-1">
+                  <motion.p initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-red-400 text-sm font-bold mt-2 px-2 flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-red-400" />
                     {errors.password.message}
                   </motion.p>
                 )}
               </AnimatePresence>
             </motion.div>
 
-            {/* Remember + Forgot */}
-            <motion.div variants={fadeUp} className="flex items-center justify-between">
-              <label className="flex items-center gap-2.5 cursor-pointer">
-                <div className="w-5 h-5 rounded border border-border bg-input/20 hover:border-primary/60 transition-colors" />
-                <span className="text-base text-muted-foreground">Remember me</span>
+            {/* Remember Me */}
+            <motion.div variants={fadeUp} className="flex items-center">
+              <label className="flex items-center gap-4 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input type="checkbox" className="sr-only peer" />
+                  <div className="w-7 h-7 rounded-lg border-2 border-border/80 bg-black/40 peer-checked:bg-primary peer-checked:border-primary transition-all duration-300 group-hover:border-primary/50" />
+                  <motion.div initial={false} animate={{ scale: 1 }} className="absolute text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-all duration-300">
+                    <Zap className="w-4 h-4 fill-current drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                  </motion.div>
+                </div>
+                <span className="text-base text-muted-foreground font-bold group-hover:text-foreground transition-colors tracking-tight">Stay signed in for 30 days</span>
               </label>
-              <Link href="#" className="text-base font-semibold hover:underline" style={{ color: INDIGO }}>
-                Forgot password?
-              </Link>
             </motion.div>
 
             {/* Sign In Button */}

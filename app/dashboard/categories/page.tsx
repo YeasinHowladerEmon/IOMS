@@ -9,6 +9,7 @@ import {
 } from "@/lib/categories";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOverlay } from "@/lib/overlay-context";
+import { useRefresh } from "@/hooks/use-refresh";
 import type { Variants } from "framer-motion";
 import { 
   Plus, 
@@ -34,6 +35,7 @@ export default function CategoriesPage() {
   const { mutateAsync: createCategory, isPending: isCreating } = useCreateCategoryMutation();
   const { mutateAsync: deleteCategory } = useDeleteCategoryMutation();
   const { showAlert } = useOverlay();
+  const { handleRefresh } = useRefresh(refetch);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCat, setNewCat] = useState<CreateCategoryPayload>({ name: "", description: "" });
@@ -86,7 +88,7 @@ export default function CategoriesPage() {
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5" />
             <p className="font-semibold">{(error as Error).message}</p>
-            <Button variant="ghost" size="sm" onClick={() => refetch()} className="ml-auto underline">
+            <Button variant="ghost" size="sm" onClick={handleRefresh} className="ml-auto underline">
               Retry
             </Button>
           </div>

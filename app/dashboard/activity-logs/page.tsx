@@ -1,6 +1,7 @@
 "use client";
 
 import { useActivityLogsQuery } from "@/lib/activities";
+import { useRefresh } from "@/hooks/use-refresh";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   History, 
@@ -19,6 +20,7 @@ import { format, isToday, isYesterday, parseISO } from "date-fns";
 
 export default function ActivityLogsPage() {
   const { data: logs = [], isLoading, error, refetch } = useActivityLogsQuery(100);
+  const { handleRefresh } = useRefresh(refetch);
 
   // Group logs by date
   const groupedLogs = logs.reduce((acc, log) => {
@@ -43,7 +45,7 @@ export default function ActivityLogsPage() {
             A comprehensive timeline of all workspace events
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => refetch()} className="border-primary/20 bg-primary/5">
+        <Button variant="outline" size="sm" onClick={handleRefresh} className="border-primary/20 bg-primary/5">
            <Activity className="w-4 h-4 mr-2" />
            Live Tracking Active
         </Button>
